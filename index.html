@@ -434,9 +434,14 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 2rem;
-            color: rgba(255, 255, 255, 0.6);
+            overflow: hidden; /* Added */
             transition: all 0.3s ease;
+        }
+
+        .photo-item img { /* Added */
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
 
         .photo-item:hover {
@@ -988,31 +993,31 @@
     <script>
         // Данные для фотоальбомов
        const albumsData = {
-    firstDay: {
-        title: "Первый день занятий",
-        photos: [
-            "img/photo_22_2025-09-01_16-49-29.jpg",
-            "img/photo_23_2025-09-01_16-49-29.jpg", 
-            "img/photo_24_2025-09-01_16-49-29.jpg",
-            "img/photo_25_2025-09-01_16-49-29.jpg",
-            "img/photo_26_2025-09-01_16-49-29.jpg"
-        ]
-    }, 
-    hackathon: {
-        title: "Конкурсы",
-        photos: []
-    }, 
-    projects: {
-        title: "Работа над проектами",
-        photos: []
-    }, 
-    events: {
-        title: "Групповые мероприятия",
-        photos: []
-    }
-};
+        firstDay: {
+            title: "Первый день занятий",
+            photos: [
+                "img/photo_22_2025-09-01_16-49-29.jpg", // Corrected path
+                "img/photo_23_2025-09-01_16-49-29.jpg", 
+                "img/photo_24_2025-09-01_16-49-29.jpg",
+                "img/photo_25_2025-09-01_16-49-29.jpg",
+                "img/photo_26_2025-09-01_16-49-29.jpg"
+            ]
+        }, 
+        hackathon: {
+            title: "Конкурсы",
+            photos: []
+        }, 
+        projects: {
+            title: "Работа над проектами",
+            photos: []
+        }, 
+        events: {
+            title: "Групповые мероприятия",
+            photos: []
+        }
+    };
 
-console.log("albumsData loaded:", albumsData);
+    console.log("albumsData loaded:", albumsData);
 
         // Навигация
         const navItems = document.querySelectorAll('.nav-item');
@@ -1054,12 +1059,29 @@ console.log("albumsData loaded:", albumsData);
             modalTitle.textContent = album.title;
             photoGrid.innerHTML = '';
 
-            album.photos.forEach(photo => {
-                const photoItem = document.createElement('div');
-                photoItem.className = 'photo-item';
-                photoItem.textContent = photo;
-                photoGrid.appendChild(photoItem);
-            });
+            if (album.photos.length === 0) {
+                photoGrid.innerHTML = '<p style="text-align: center; width: 100%;">Фотографий в этом альбоме пока нет.</p>';
+            } else {
+                album.photos.forEach(photoSrc => {
+                    const photoItem = document.createElement('div');
+                    photoItem.className = 'photo-item';
+                    
+                    const img = document.createElement('img');
+                    img.src = photoSrc;
+                    img.alt = album.title;
+                    // Handle image loading errors
+                    img.onerror = () => {
+                        photoItem.innerHTML = '🖼️<br><small>Не удалось загрузить</small>';
+                        photoItem.style.alignItems = 'center';
+                        photoItem.style.justifyContent = 'center';
+                        photoItem.style.textAlign = 'center';
+                        photoItem.style.fontSize = '1rem';
+                    };
+                    
+                    photoItem.appendChild(img);
+                    photoGrid.appendChild(photoItem);
+                });
+            }
 
             modal.style.display = 'block';
         }
